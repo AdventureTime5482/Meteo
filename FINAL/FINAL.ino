@@ -1,6 +1,8 @@
 #include <LiquidCrystal_I2C.h>
-
 LiquidCrystal_I2C lcd(0x27,16,2);
+
+#include <iarduino_RTC.h>
+iarduino_RTC time(RTC_DS1302,6,8,7);  // для модуля DS1302 - RST, CLK, DAT
 
 #include <DHT.h>
 #include <DHT_U.h>
@@ -19,6 +21,13 @@ void Meteo(){
   lcd.print(dht.readHumidity());
 }
 
+void RTC(){
+   if (millis() % 1000 == 0) {
+      lcd.setCursor(0,0);
+      lcd.print(time.gettime("d-m-Y, H:i:s, D"));
+      delay(1);
+   }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -28,6 +37,8 @@ lcd.init();
 lcd.backlight();
 lcd.clear();
 dht.begin();
+time.begin();
+time.settime(0, 30, 18, 12, 6, 20, 5); // 0  сек, 30 мин, 18 часов, 12, июня, 2020, четверг
 }
 
 void loop() {
@@ -49,8 +60,10 @@ void loop() {
   Meteo();
   break;
   case 2:
-  lcd.setCursor(5,0);
-  lcd.print("REZ2");
+//  lcd.setCursor(5,0);
+//  lcd.print("REZ2");
+  lcd.clear();
+  RTC();
   break;
   case 3:
   lcd.setCursor(5,0);
